@@ -37,17 +37,21 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.AccountV
 
     @Override
     public void onBindViewHolder(@NonNull AccountViewHolder holder, int position) {
-        Account1 account = accountList.get(position);
-        if(account ==null){
-            return ;
-
+        final Account1 account = accountList.get(position);
+        if (account == null) {
+            return;
         }
 
-                holder.userIdTextView.setText(String.valueOf(account.getId()));
+        holder.IdTextView.setText(String.valueOf(account.getId()));
         holder.completedTextView.setText(account.getCompleted() ? "Completed" : "Not Completed");
         holder.textView1.setText("Completed:");
         holder.titleTextView.setText(account.getTitle());
+
+        // Xử lý sự kiện khi người dùng chạm vào mỗi todo item
+
+
     }
+
 
     @Override
     public int getItemCount() {
@@ -58,14 +62,14 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.AccountV
 
     public static class AccountViewHolder extends RecyclerView.ViewHolder {
 
-        TextView userIdTextView;
+        TextView IdTextView;
         TextView completedTextView;
         TextView textView1;
         TextView titleTextView;
 
         public AccountViewHolder(@NonNull View itemView) {
             super(itemView);
-            userIdTextView = itemView.findViewById(R.id.id);
+            IdTextView = itemView.findViewById(R.id.id);
             completedTextView = itemView.findViewById(R.id.completed);
             textView1 = itemView.findViewById(R.id.textView1);
             titleTextView = itemView.findViewById(R.id.title);

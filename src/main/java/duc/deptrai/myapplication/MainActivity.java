@@ -4,8 +4,10 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -15,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import duc.deptrai.myapplication.Adapter.AccountAdapter;
+import duc.deptrai.myapplication.Click.RecyclerItemClickListener;
 import duc.deptrai.myapplication.Model.Account1;
 import duc.deptrai.myapplication.api.ApiService;
 import retrofit2.Call;
@@ -24,8 +27,8 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
-//    private AccountAdapter accountAdapter;
     private List<Account1> accountList;
+    private AccountAdapter accountAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.rcv_acc);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        DividerItemDecoration itemDecoration = new DividerItemDecoration(this,DividerItemDecoration.VERTICAL);
+        DividerItemDecoration itemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
         recyclerView.addItemDecoration(itemDecoration);
         accountList = new ArrayList<>();
         if (isNetworkAvailable()) {
@@ -44,35 +47,67 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this, "Không có kết nối mạng, vui lòng thử lại", Toast.LENGTH_SHORT).show();
         }
 
+        recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, recyclerView, new RecyclerItemClickListener.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                // Xử lý khi người dùng nhấn vào mục
+                Account1 account = accountList.get(position);
+                if (account != null) {
+                    Toast.makeText(MainActivity.this, "Bạn đã chọn UserID: " + account.getUserId(), Toast.LENGTH_SHORT).show();
+                }
+            }
 
-//
-//        accountList = new ArrayList<>();
-//        // Thêm các phần tử Account1 vào danh sách
-//        accountList.add(new Account1(1, 1, "Title 1", true));
-//        accountList.add(new Account1(2, 2, "Title 2", false));
-        // Thêm nhiều phần tử hơn nếu cần
-
-//        accountAdapter = new AccountAdapter(this, accountList);
-//        recyclerView.setAdapter(accountAdapter);
+            @Override
+            public void onLongItemClick(View view, int position) {
+                // Xử lý khi người dùng giữ lâu trên mục
+                showDeleteConfirmationDialog(position);
+            }
+        }));
     }
-    private  void callApiGetAccount(){
+
+    private void callApiGetAccount() {
         ApiService.apiService.getListAccount(1).enqueue(new Callback<List<Account1>>() {
             @Override
             public void onResponse(Call<List<Account1>> call, Response<List<Account1>> response) {
-                accountList=response.body();
-                AccountAdapter accountAdapter1 = new AccountAdapter(accountList);
-                recyclerView.setAdapter(accountAdapter1);
+                if (response.isSuccessful()) {
+                    List<Account1> accounts = response.body();
+                    if (accounts != null) {
+                        accountList.addAll(accounts);
+                        accountAdapter = new AccountAdapter(accountList);
+                        recyclerView.setAdapter(accountAdapter);
+                    } else {
+                        Toast.makeText(MainActivity.this, "Danh sách account rỗng", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(MainActivity.this, "Lỗi khi gọi API", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
             public void onFailure(Call<List<Account1>> call, Throwable t) {
-                Toast.makeText(MainActivity.this,"onfalue",Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Lỗi khi gọi API", Toast.LENGTH_SHORT).show();
             }
         });
     }
+
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
         return networkInfo != null && networkInfo.isConnected();
+    }
+
+    private void showDeleteConfirmationDialog(final int position) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Có thực sự muốn xóa todo này không?")
+                .setPositiveButton("Có", (dialog, which) -> {
+                    // Xóa todo khỏi danh sách
+                    if (accountAdapter != null) {
+                        accountList.remove(position);
+                        accountAdapter.notifyItemRemoved(position);
+                    }
+                })
+                .setNegativeButton("Không", (dialog, which) -> dialog.dismiss());
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 }
