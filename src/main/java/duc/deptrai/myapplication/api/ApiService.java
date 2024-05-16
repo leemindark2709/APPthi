@@ -17,5 +17,5 @@ public interface ApiService {
             .create(ApiService.class);
 
     @GET("todos")
-    Call<List<Account1>> getListAccount(@Query("userId") int userId);
+    Call<List<Account1>> getListAccount();
 }

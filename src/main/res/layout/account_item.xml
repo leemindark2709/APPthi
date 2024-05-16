@@ -6,6 +6,9 @@
     android:padding="10dp">
 
     <!-- RelativeLayout để chứa userId, textView1 và textView cùng hàng -->
+
+    <!-- title TextView nằm bên dưới RelativeLayout -->
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -15,7 +18,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="22dp"
             android:layout_marginTop="16dp"
             android:text="id"
             android:textColor="@android:color/black" />
@@ -37,9 +40,17 @@
             android:layout_marginEnd="16dp"
             android:layout_toStartOf="@id/completed"
             android:text="textView1" />
+
+        <TextView
+            android:id="@+id/textView6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:text="id:" />
+
     </RelativeLayout>
 
-    <!-- title TextView nằm bên dưới RelativeLayout -->
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
@@ -49,9 +60,4 @@
         android:layout_marginTop="5dp"
         android:layout_marginStart="16dp"/>
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="TextView2" />
 </LinearLayout>
